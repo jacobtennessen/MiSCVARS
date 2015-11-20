@@ -5,4 +5,4 @@ MakeOnemapFormatFromVcfNoParentsTwoGenos.pl - reads a vcf file and converts it t
 
 FilterSplitFastqs.pl - reads fastq files that consists of multiple samples identified in read title. Splits samples into individual files and renames them. Designed for output of dbcAmplicons from IBEST
 
-MakeHTMLfromOneMap.pl- reads OneMap format file and coverts to color-coded HTML for easy viewing. Optionallly reads a file of sex phenotypes and adds in that information.
+MakeHTMLfromOneMapSex.pl- reads OneMap format file and coverts to color-coded HTML for easy viewing. Optionallly reads a file of sex phenotypes and adds in that information.
