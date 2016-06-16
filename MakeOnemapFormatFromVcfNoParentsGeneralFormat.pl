@@ -40,16 +40,26 @@ Usage: perl MakeOnemapFormatFromVcfNoParentsGeneralFormat.pl options
 
 # command line processing.
 getopts('g:q:c:m:o:h:');
+
 die $usage unless ($opt_g);
-
-my ($genotypes, $lowqual, $commonthresh, $missingthresh, $outfolder, $maxhomos);
-
-$genotypes = $opt_g if $opt_g;
-$lowqual = $opt_q ? $opt_q : 15;
-$commonthresh = $opt_c ? $opt_c : 6;
-$missingthresh = $opt_m ? $opt_m : 0.3;
-$outfolder = $opt_o if $opt_o;
-$maxhomos = $opt_h ? $opt_h : 2;
+my $genotypes = $opt_g if $opt_g;
+my $commonthresh = 6;
+if (defined $opt_c) {
+    $commonthresh = $opt_c;
+}
+my $lowqual = 15;
+if (defined $opt_q) {
+    $lowqual = $opt_q;
+}
+my $missingthresh = 0.3;
+if (defined $opt_m) {
+    $missingthresh = $opt_m;
+}
+my $maxhomos = 2;
+if (defined $opt_h) {
+    $maxhomos = $opt_h;
+}
+my $outfolder = $opt_o if $opt_o;
 
 my @vcffiledata = split /\//, $genotypes;
 
