@@ -8,8 +8,8 @@ use vars qw( $opt_g $opt_q $opt_c $opt_m $opt_o);
 
 # Usage
 my $usage = "
-MakeOnemapFormatFromVcfNoParentsTwoGenos.pl - reads a vcf file and converts it to OneMap format, only for sites inferred to be heterozygous in one parent
-Copyright (C) 2015 by Jacob A Tennessen
+MakeOnemapFormatFromVcfNoParentsTwoGenos.pl - reads a vcf file and converts it to OneMap format, only for sites heterozygous in one parent (assumed to be the same parent)
+Copyright (C) 2016 by Jacob A Tennessen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -55,7 +55,11 @@ my $vcf = pop @vcffiledata;
 
 my @vcfnamedata = split /\./, $vcf;
 
-my $outputfile = "OneMap_no_parents_qual$lowqual"."_$vcfnamedata[0].txt";
+my $suffix = pop @vcfnamedata;
+
+my $shortname = join "\.", @vcfnamedata;
+
+my $outputfile = "OneMap_no_parents_qual$lowqual"."_$shortname.txt";
 
 if (defined $outfolder) {
     unless ($outfolder =~ /\/$/) {
@@ -103,14 +107,27 @@ while (<IN>) {
     my $missingcount = 0;
     my %hets;
     my %homos;
+    my $dppos;
+    my $plpos;
+    my @genoformat = split ":", $data[8];
+    for (my $gf = 0; $gf < (scalar(@genoformat)); $gf++) {
+        if ($genoformat[$gf] =~ /DP/) {
+            $dppos = $gf;
+        } elsif ($genoformat[$gf] =~ /PL/) {
+            $plpos = $gf;
+        }
+    }
+    unless ((defined $dppos)&&(defined $plpos)) {
+        next;
+    }
     foreach my $i (@inds) {
 	my @idata = split ":", $i;
-	if (defined $idata[2]) { #SNP called
-	    if ($idata[2] == 0) {
+	if (defined $idata[$dppos]) { #SNP called
+	    if (($idata[$dppos] !~ /\d/)||($idata[$dppos] == 0)||($idata[$plpos] !~ /\d/)) {
             push @tempgenos, "-";
             $missingcount +=1;
 	    } else {
-            my @pldata = split ",", $idata[1];
+            my @pldata = split ",", $idata[$plpos];
             my $low;
             for (my $pl = 0; $pl < (scalar(@pldata)); $pl++) {
                 if (($pldata[$pl] > 0)&&($pldata[$pl] < $lowqual)) { #if there are ambiguous possible genotypes, it's missing data.
